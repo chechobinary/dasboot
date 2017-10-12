@@ -1,16 +1,25 @@
 
 node {
 
-    notify('started')
-    stage('Checkout') {
-        checkout scm
-    }
-
-    stage('build') {
-        def mvn_version = 'M3'
-        withEnv( ["PATH+MAVEN=${tool mvn_version}/bin"] ) {
-            sh 'mvn clean install'
+    try {
+        notify('Started')
+        stage('Checkout') {
+            checkout scm
         }
+
+        stage('build') {
+            def mvn_version = 'M3'
+            withEnv(["PATH+MAVEN=${tool mvn_version}/bin"]) {
+                sh 'mvn clean install'
+            }
+        }
+
+        notify('Success')
+
+    } catch (err) {
+        notify("Error: ${err}")
+        currentBuild.result = 'FAILURE'
+
     }
 }
 
